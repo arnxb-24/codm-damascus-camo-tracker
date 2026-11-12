@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CODM Damascus Camo Tracker By @arnob24</title>
+    <meta name="description" content="Free, ad-free Call of Duty: Mobile Damascus camo tracker. Progress is saved privately in your browser, with JSON backup and restore.">
+    <meta name="theme-color" content="#050507">
+    <meta property="og:title" content="CODM Damascus Camo Tracker">
+    <meta property="og:description" content="Track your CODM Damascus grind across every weapon. Free, ad-free, no account needed.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -374,8 +380,6 @@
 
         /* Weapon Cards Staggered Entrance & Diagonal Gold Sheen */
         .weapon-card {
-            opacity: 0;
-            animation: cardStaggerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
             position: relative;
             overflow: hidden;
             transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
@@ -409,6 +413,14 @@
         }
         .weapon-card:active {
             transform: translateY(-1px) scale(0.99);
+        }
+
+        .weapon-card.reveal { animation: cardStaggerReveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+        .scrollbar-none { scrollbar-width: none; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+            #goldDustCanvas { display: none; }
         }
 
         .gold-crown-anim {
@@ -482,7 +494,7 @@
                     </h1>
                     <p class="text-xs text-amber-400/90 font-medium flex flex-wrap items-center gap-x-2">
                         <span>100% ad free and Free to use for everyone</span>
-                        <span class="text-amber-200/70 italic">(Dropping a like will motivate me to update and make it even better :)</span>
+                        
                     </p>
                 </div>
             </div>
@@ -490,46 +502,27 @@
             <!-- Action Controls & Auth Status -->
             <div class="flex items-center space-x-3">
                 
-                <!-- Like Button -->
-                <button id="btnLike" class="gold-sheen-btn bg-black/80 hover:bg-amber-950/40 border border-amber-500/35 rounded-lg px-3 py-1.5 flex items-center space-x-1.5 text-xs text-amber-300 transition group shadow-md">
-                    <i class="fa-solid fa-heart text-rose-500 group-hover:scale-125 transition-transform duration-200"></i>
-                    <span id="likeCountText" class="font-mono font-bold">0</span>
-                </button>
-
-                <!-- Luxury Obsidian Black & 24K Gold Animated Visit Counter -->
-                <div title="Total Visits Tracker" class="luxury-visit-pill select-none cursor-default">
-                    <div class="luxury-visit-inner px-3 py-1.5 flex items-center space-x-2 text-xs font-mono">
-                        <div class="luxury-visit-sheen"></div>
-                        <span class="luxury-gold-beacon shrink-0"></span>
-                        <i class="fa-solid fa-eye text-[11px] luxury-gold-eye"></i>
-                        <span id="globalUserCountText" class="luxury-gold-number font-extrabold tracking-tight text-[13px]">1</span>
-                        <span class="hidden sm:inline luxury-gold-label font-bold text-[9px] uppercase">VISITS</span>
-                    </div>
-                </div>
-
                 <!-- Settings Button (Data Backup & Reset) -->
                 <button id="btnSettingsModal" title="Settings & Backup" class="gold-sheen-btn bg-black/80 hover:bg-amber-950/30 text-amber-200 border border-amber-500/30 text-xs px-3 py-2 rounded-lg transition flex items-center space-x-1.5 group">
                     <i class="fa-solid fa-gear text-codGold group-hover:rotate-90 transition-transform duration-300"></i>
                     <span class="hidden md:inline">Settings</span>
                 </button>
 
-                <!-- Auth Status Pill -->
-                <div id="userBadge" class="bg-black/90 border border-amber-500/25 rounded-lg px-3 py-1.5 flex items-center space-x-2 text-xs">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                    <span id="userEmailText" class="text-amber-100/90 font-mono max-w-[120px] sm:max-w-[200px] truncate">Guest Mode</span>
-                </div>
-
-                <!-- Auth Modal Trigger Button -->
-                <button id="btnAuthModal" class="gold-sheen-btn bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600 hover:from-amber-300 hover:to-amber-500 text-black font-extrabold text-xs px-4 py-2 rounded-lg transition shadow-lg shadow-amber-500/25 flex items-center space-x-2">
-                    <i class="fa-solid fa-user-lock"></i>
-                    <span id="btnAuthText">Cloud Sync / Login</span>
-                </button>
+                
             </div>
         </div>
     </header>
 
     <!-- MAIN APP CONTAINER -->
     <main class="relative z-10 flex-grow max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+        <div id="backupBanner" class="hidden rounded-xl border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-xs text-amber-100 flex flex-wrap items-center justify-between gap-3">
+            <span><i class="fa-solid fa-triangle-exclamation text-codGold mr-1.5"></i>Your progress is saved <b>only in this browser</b>. Download a backup so you never lose it.</span>
+            <span class="flex gap-2">
+                <button id="btnBannerBackup" class="gold-sheen-btn bg-gradient-to-r from-amber-400 to-yellow-600 text-black font-black px-3 py-1.5 rounded-lg">Back up now</button>
+                <button id="btnBannerInfo" class="gold-sheen-btn bg-black border border-amber-500/40 text-amber-200 font-bold px-3 py-1.5 rounded-lg">How it works</button>
+            </span>
+        </div>
+
 
         <!-- STATS & PROGRESS OVERVIEW DASHBOARD -->
         <section class="obsidian-gold-panel rounded-2xl p-5 sm:p-6 backdrop-blur relative overflow-hidden">
@@ -717,51 +710,6 @@
         </div>
     </div>
 
-    <!-- AUTHENTICATION MODAL -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="authModalBox" class="bg-[#09090d] border border-amber-500/35 rounded-2xl max-w-md w-full p-6 shadow-[0_0_50px_rgba(0,0,0,0.95),0_0_25px_rgba(212,175,55,0.18)] relative overflow-hidden transform scale-90 translate-y-4 transition-all duration-300 ease-out">
-            
-            <button id="btnCloseAuthModal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black border border-amber-500/30 hover:bg-amber-950/50 text-gray-400 hover:text-amber-300 flex items-center justify-center transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="text-center mb-6">
-                <div class="w-12 h-12 rounded-xl gold-gradient-bg p-0.5 mx-auto mb-3 flex items-center justify-center shadow-lg shadow-amber-500/30">
-                    <div class="w-full h-full bg-black rounded-[10px] flex items-center justify-center">
-                        <i class="fa-solid fa-cloud-arrow-up text-codGold text-xl animate-bounce"></i>
-                    </div>
-                </div>
-                <h3 class="text-xl font-bold text-white">Cloud Sync Account</h3>
-                <p class="text-xs text-gray-400 mt-1">Sign in to save your Damascus grind across multiple devices.</p>
-            </div>
-
-            <div class="flex bg-black p-1 rounded-xl border border-amber-500/25 mb-5 text-xs">
-                <button id="tabAuthLogin" class="flex-1 py-2 font-bold rounded-lg text-black bg-gradient-to-r from-amber-300 to-amber-500 transition">Login</button>
-                <button id="tabAuthSignup" class="flex-1 py-2 font-bold rounded-lg text-gray-400 hover:text-amber-200 transition">Sign Up</button>
-            </div>
-
-            <form id="authForm" class="space-y-4">
-                <div id="authMessage" class="hidden text-xs p-3 rounded-lg border"></div>
-                <div>
-                    <label class="text-xs text-amber-200/80 block mb-1">Email</label>
-                    <input type="email" id="authEmail" required class="w-full bg-black border border-amber-500/25 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-400 transition">
-                </div>
-                <div>
-                    <label class="text-xs text-amber-200/80 block mb-1">Password</label>
-                    <input type="password" id="authPassword" required class="w-full bg-black border border-amber-500/25 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-400 transition">
-                </div>
-                <button type="submit" id="btnAuthSubmit" class="gold-sheen-btn w-full bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-600 hover:from-amber-300 text-black font-black text-xs py-3 rounded-xl transition shadow-lg shadow-amber-500/25">
-                    Log In
-                </button>
-            </form>
-
-            <button id="btnLogout" class="hidden w-full mt-3 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Log Out</span>
-            </button>
-        </div>
-    </div>
-
     <!-- SETTINGS & BACKUP MODAL -->
     <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
         <div id="settingsModalBox" class="bg-[#09090d] border border-amber-500/35 rounded-2xl max-w-md w-full p-6 shadow-[0_0_50px_rgba(0,0,0,0.95),0_0_25px_rgba(212,175,55,0.18)] relative space-y-5 transform scale-90 translate-y-4 transition-all duration-300 ease-out">
@@ -789,30 +737,25 @@
                 </div>
             </div>
 
+            <div class="rounded-xl border border-amber-500/25 bg-black/60 p-3 text-[11px] text-amber-100/85 space-y-1.5">
+                <p class="font-bold text-codGold"><i class="fa-solid fa-circle-info mr-1.5"></i>Where is my progress saved?</p>
+                <p>Only in this browser, on this device. There is no account and no cloud copy.</p>
+                <p class="font-bold text-amber-300 pt-1">How to avoid losing it:</p>
+                <ul class="list-disc pl-4 space-y-0.5">
+                    <li>Export a backup regularly and keep the file somewhere safe (cloud drive, or email it to yourself).</li>
+                    <li>Do not clear site data, cookies or browsing history for this site.</li>
+                    <li>Use the same browser. Private/incognito mode erases everything when closed.</li>
+                    <li>New phone or browser? Export here, then Import there.</li>
+                    <li>Importing replaces your current progress.</li>
+                </ul>
+                <p id="lastBackupText" class="font-mono text-amber-300 pt-1"></p>
+            </div>
+
             <div class="pt-4 border-t border-amber-500/20">
                 <p class="text-[11px] text-rose-400/80 font-mono mb-2">Danger Zone</p>
                 <button id="btnResetAll" class="w-full bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>Reset All Camo Progress</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BACKUP / RESTORE DATA MODAL -->
-    <div id="backupModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="bg-[#09090d] border border-amber-500/35 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button id="btnCloseBackupModal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black border border-gray-800 text-gray-400 hover:text-white flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            
-            <h3 class="text-lg font-bold text-white mb-1">Data Backup & Restore</h3>
-            <p class="text-xs text-gray-400 mb-4">Export your progress to a JSON file or restore from a previous save.</p>
-
-            <div class="space-y-3">
-                <button id="btnExportDataFallback" class="w-full bg-slate-800 hover:bg-slate-700 border border-gray-700 text-gray-200 font-bold text-xs py-3 rounded-xl transition flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-download text-codGold"></i>
-                    <span>Export Data (JSON)</span>
                 </button>
             </div>
         </div>
@@ -837,39 +780,24 @@
 
     <!-- APPLICATION JAVASCRIPT -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            onAuthStateChanged,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            updateDoc,
-            increment,
-            onSnapshot 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
 
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'codm-damascus-tracker-arnob24';
+        
         
         // App State & Globals Initialization
-        let auth = null;
-        let db = null;
-        let currentUser = null;
+        
+        
+        
         let activeModalWeaponId = null;
         let currentCategoryFilter = 'All';
         let currentStatusFilter = 'all';
         let searchQuery = '';
-        let authMode = 'login';
-        let displayedVisitCount = 1;
-        let visitAnimFrameId = null;
+        
+        
+        
         let confettiAnimId = null;
+        let animateGrid = true;
+        let celebrated = false;
 
         const statCounterCache = {
             statGoldCount: 0,
@@ -878,7 +806,22 @@
             statTasksDone: 0
         };
 
-        let localProgressData = JSON.parse(localStorage.getItem('codm_damascus_progress') || '{}');
+        let localProgressData = {};
+        try { localProgressData = JSON.parse(localStorage.getItem('codm_damascus_progress') || '{}') || {}; } catch (e) { localProgressData = {}; }
+
+        function sanitizeProgress(o) {
+            if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('bad save');
+            const clean = {};
+            const ids = ['sand', 'dragon', 'splinter', 'tiger', 'jungle', 'reptile'];
+            for (const w of WEAPONS_DATABASE) {
+                const v = o[w.id];
+                if (v && typeof v === 'object') {
+                    clean[w.id] = {};
+                    ids.forEach(t => { if (v[t] === true) clean[w.id][t] = true; });
+                }
+            }
+            return clean;
+        }
 
         // Ambient 24K Gold Dust Particle Background System
         function initGoldDustParticles() {
@@ -937,42 +880,7 @@
         }
 
         // Smooth Odometer Roll-up Number Animation for Luxury Visit Counter
-        function animateVisitCounter(targetValue) {
-            const el = document.getElementById('globalUserCountText');
-            if (!el) return;
-
-            const target = Math.max(1, parseInt(targetValue, 10) || 1);
-            const start = displayedVisitCount;
-            if (start === target) {
-                el.innerText = target.toLocaleString();
-                return;
-            }
-
-            if (visitAnimFrameId) {
-                cancelAnimationFrame(visitAnimFrameId);
-            }
-
-            const duration = 900;
-            const startTime = performance.now();
-
-            function step(now) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 5);
-                const current = Math.round(start + (target - start) * eased);
-                el.innerText = current.toLocaleString();
-
-                if (progress < 1) {
-                    visitAnimFrameId = requestAnimationFrame(step);
-                } else {
-                    displayedVisitCount = target;
-                    el.innerText = target.toLocaleString();
-                    visitAnimFrameId = null;
-                }
-            }
-
-            visitAnimFrameId = requestAnimationFrame(step);
-        }
+        
 
         // Smooth Count-Up Animation for Dashboard Stat Cards
         function animateStatNumber(elementId, targetValue) {
@@ -1002,26 +910,7 @@
         }
 
         // Floating Golden Heart Burst Effect on Like Click
-        function spawnHeartBurst(originEl) {
-            if (!originEl) return;
-            const rect = originEl.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-
-            for (let i = 0; i < 7; i++) {
-                const heart = document.createElement('i');
-                const isGold = i % 2 === 0;
-                heart.className = `fa-solid fa-heart heart-particle text-xs ${isGold ? 'text-amber-400' : 'text-rose-500'}`;
-                heart.style.left = `${cx}px`;
-                heart.style.top = `${cy}px`;
-                const angle = (Math.PI * 2 * i) / 7 + (Math.random() - 0.5) * 0.4;
-                const dist = 36 + Math.random() * 28;
-                heart.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
-                heart.style.setProperty('--ty', `${Math.sin(angle) * dist - 20}px`);
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 900);
-            }
-        }
+        
 
         // Categories List
         const CATEGORIES = ['All', 'AR', 'SMG', 'LMG', 'Sniper', 'Marksman', 'Shotgun', 'Pistol', 'Launcher', 'Melee'];
@@ -1304,126 +1193,48 @@
         }
 
         // Like Button Functionality with Firestore Cloud Sync & Heart Particle Burst
-        function setupLikesSystem() {
-            const btnLike = document.getElementById('btnLike');
-            if (!db) {
-                btnLike.addEventListener('click', () => {
-                    spawnHeartBurst(btnLike);
-                });
-                return;
-            }
-            const likesDocRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'metrics', 'likes');
+        
 
-            onSnapshot(likesDocRef, (snap) => {
-                if (snap.exists()) {
-                    document.getElementById('likeCountText').innerText = snap.data().count || 0;
-                }
-            }, (err) => console.log(err));
+        
 
-            btnLike.addEventListener('click', async () => {
-                spawnHeartBurst(btnLike);
-                if (!currentUser || currentUser.isAnonymous) {
-                    openAuthModal();
-                    const msgBox = document.getElementById('authMessage');
-                    msgBox.innerText = "Please log in with an account to drop a like!";
-                    msgBox.className = "text-xs p-3 rounded-lg border bg-amber-950/40 border-amber-800 text-amber-300 mb-2";
-                    msgBox.classList.remove('hidden');
-                    return;
-                }
+        
 
-                try {
-                    await setDoc(likesDocRef, { count: increment(1) }, { merge: true });
-                } catch (e) {
-                    console.error("Like failed:", e);
-                }
-            });
-        }
+        
 
-        function initFirebase() {
+        function saveProgress() {
             try {
-                if (typeof __firebase_config !== 'undefined') {
-                    const app = initializeApp(JSON.parse(__firebase_config));
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-
-                    setupLikesSystem();
-
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            currentUser = user;
-                            setupFirestoreSync(user.uid);
-                        } else {
-                            try {
-                                const anonResult = await signInAnonymously(auth);
-                                currentUser = anonResult.user;
-                                setupFirestoreSync(currentUser.uid);
-                            } catch (e) {
-                                console.log("Anonymous auth fallback");
-                            }
-                        }
-                        updateUserAuthUI();
-                    });
-                } else {
-                    setupLikesSystem();
-                    let localVisits = parseInt(localStorage.getItem('codm_local_visits') || '1') + 1;
-                    localStorage.setItem('codm_local_visits', localVisits);
-                    animateVisitCounter(localVisits);
-                }
+                localStorage.setItem('codm_damascus_progress', JSON.stringify(localProgressData));
             } catch (e) {
-                console.log("Running in offline localStorage mode.");
-                setupLikesSystem();
-                let localVisits = parseInt(localStorage.getItem('codm_local_visits') || '1') + 1;
-                localStorage.setItem('codm_local_visits', localVisits);
-                animateVisitCounter(localVisits);
+                if (!saveProgress.warned) {
+                    saveProgress.warned = true;
+                    alert('Your browser is blocking storage (private mode?), so progress will NOT be saved. Use Settings > Export to keep a backup.');
+                }
             }
             renderApp();
         }
 
-        function setupFirestoreSync(uid) {
-            if (!db || !uid) return;
-            const userDocRef = doc(db, 'artifacts', APP_ID, 'users', uid, 'camoData', 'progress');
-            const metricsRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'metrics', 'stats');
-
-            onSnapshot(metricsRef, (snap) => {
-                if (snap.exists() && snap.data().totalVisits !== undefined) {
-                    animateVisitCounter(snap.data().totalVisits);
-                }
-            }, (err) => console.log("Visit listener error:", err));
-
-            getDoc(metricsRef).then((snap) => {
-                if (!snap.exists()) {
-                    setDoc(metricsRef, { totalVisits: 1 }, { merge: true });
-                } else {
-                    updateDoc(metricsRef, { totalVisits: increment(1) }).catch(() => {
-                        setDoc(metricsRef, { totalVisits: increment(1) }, { merge: true });
-                    });
-                }
-            }).catch(() => {
-                let localVisits = parseInt(localStorage.getItem('codm_local_visits') || '1') + 1;
-                localStorage.setItem('codm_local_visits', localVisits);
-                animateVisitCounter(localVisits);
-            });
-
-            onSnapshot(userDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const cloudData = docSnap.data();
-                    localProgressData = { ...localProgressData, ...cloudData };
-                    localStorage.setItem('codm_damascus_progress', JSON.stringify(localProgressData));
-                } else {
-                    setDoc(userDocRef, localProgressData, { merge: true });
-                }
-                renderApp();
-            }, (error) => {
-                console.error("Firestore error:", error);
-            });
+        function hasProgress() {
+            return Object.values(localProgressData).some(v => v && Object.values(v).some(Boolean));
         }
 
-        function saveProgress() {
-            localStorage.setItem('codm_damascus_progress', JSON.stringify(localProgressData));
-            if (currentUser && db) {
-                const userDocRef = doc(db, 'artifacts', APP_ID, 'users', currentUser.uid, 'camoData', 'progress');
-                setDoc(userDocRef, localProgressData, { merge: true }).catch(err => console.error(err));
-            }
+        function markBackedUp() {
+            try { localStorage.setItem('codm_last_backup', String(Date.now())); } catch (e) {}
+            updateBackupInfo();
+        }
+
+        function updateBackupInfo() {
+            let last = 0;
+            try { last = parseInt(localStorage.getItem('codm_last_backup') || '0', 10) || 0; } catch (e) {}
+            const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+            const label = document.getElementById('lastBackupText');
+            if (label) label.innerText = last ? `Last backup: ${new Date(last).toLocaleDateString()}` : 'Last backup: never';
+            const banner = document.getElementById('backupBanner');
+            if (banner) banner.classList.toggle('hidden', !(hasProgress() && (days === null || days >= 7)));
+        }
+
+        function initLocal() {
+            // Ask the browser not to evict this site's saved data when storage runs low.
+            try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
             renderApp();
         }
 
@@ -1463,6 +1274,7 @@
             document.querySelectorAll('.cat-tab-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     currentCategoryFilter = e.currentTarget.dataset.cat;
+                    animateGrid = true;
                     renderCategoryTabs();
                     renderWeaponsGrid();
                 });
@@ -1520,6 +1332,7 @@
                 triggerCelebration();
             } else {
                 damascusBadge.classList.add('hidden');
+                celebrated = false;
             }
 
             const catStatsContainer = document.getElementById('categoryStatsBar');
@@ -1577,7 +1390,7 @@
                     : 'border-amber-500/15 bg-gradient-to-b from-[#0c0c10] to-[#060608]';
 
                 return `
-                    <div data-weapon-id="${w.id}" style="animation-delay: ${staggerDelay}ms" class="weapon-card rounded-2xl border ${cardBorder} p-4 cursor-pointer group flex flex-col justify-between min-h-[180px]">
+                    <div data-weapon-id="${w.id}" style="animation-delay: ${staggerDelay}ms" class="weapon-card ${animateGrid ? 'reveal' : ''} rounded-2xl border ${cardBorder} p-4 cursor-pointer group flex flex-col justify-between min-h-[180px]">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-black/90 text-amber-200/80 border border-amber-500/25 uppercase font-bold">${w.category}</span>
@@ -1609,6 +1422,7 @@
                 `;
             }).join('');
 
+            animateGrid = false;
             document.querySelectorAll('.weapon-card').forEach(card => {
                 card.addEventListener('click', (e) => {
                     openTaskModal(e.currentTarget.dataset.weaponId);
@@ -1676,32 +1490,11 @@
             activeModalWeaponId = null;
         }
 
-        function updateUserAuthUI() {
-            const emailText = document.getElementById('userEmailText');
-            const btnAuthText = document.getElementById('btnAuthText');
-            const btnLogout = document.getElementById('btnLogout');
+        
 
-            if (currentUser && !currentUser.isAnonymous) {
-                if (emailText) emailText.innerText = currentUser.email || 'Authenticated';
-                if (btnAuthText) btnAuthText.innerText = 'Account Settings';
-                if (btnLogout) btnLogout.classList.remove('hidden');
-            } else {
-                if (emailText) emailText.innerText = 'Guest Mode';
-                if (btnAuthText) btnAuthText.innerText = 'Cloud Sync / Login';
-                if (btnLogout) btnLogout.classList.add('hidden');
-            }
-        }
+        
 
-        function openAuthModal() {
-            document.getElementById('authModal').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('authModalBox').classList.remove('scale-90', 'translate-y-4');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('authModalBox').classList.add('scale-90', 'translate-y-4');
-            document.getElementById('authMessage').classList.add('hidden');
-        }
+        
 
         // Golden Confetti Particle Burst for Damascus Unlocked Overlay
         function startGoldenConfetti() {
@@ -1750,12 +1543,15 @@
         }
 
         function triggerCelebration() {
+            if (celebrated) return;
+            celebrated = true;
             document.getElementById('celebrationOverlay').classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('celebrationBox').classList.remove('scale-90');
             startGoldenConfetti();
         }
 
         function renderApp() {
+            updateBackupInfo();
             renderCategoryTabs();
             renderStatsHeader();
             renderWeaponsGrid();
@@ -1763,7 +1559,15 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initGoldDustParticles();
-            initFirebase();
+            initLocal();
+            document.getElementById('btnBannerBackup').addEventListener('click', () => document.getElementById('btnExportData').click());
+            document.getElementById('btnBannerInfo').addEventListener('click', () => document.getElementById('btnSettingsModal').click());
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    ['btnCloseModal', 'btnCloseSettingsModal', 'btnCloseCelebration']
+                        .forEach(id => document.getElementById(id)?.click());
+                }
+            });
 
             const searchInput = document.getElementById('searchInput');
             const btnClearSearch = document.getElementById('btnClearSearch');
@@ -1806,6 +1610,7 @@
                     e.currentTarget.classList.add('text-black', 'font-bold', 'bg-gradient-to-r', 'from-amber-300', 'to-amber-500', 'shadow-sm');
                     e.currentTarget.classList.remove('text-gray-400', 'font-medium');
                     currentStatusFilter = e.currentTarget.dataset.statusFilter;
+                    animateGrid = true;
                     renderWeaponsGrid();
                 });
             });
@@ -1823,6 +1628,7 @@
             document.getElementById('btnResetAll').addEventListener('click', () => {
                 if (confirm("Are you sure you want to reset ALL camo progress back to 0%?")) {
                     localProgressData = {};
+                    celebrated = false;
                     saveProgress();
                 }
             });
@@ -1850,63 +1656,16 @@
                 openTaskModal(activeModalWeaponId);
             });
 
-            document.getElementById('btnAuthModal').addEventListener('click', openAuthModal);
-            document.getElementById('btnCloseAuthModal').addEventListener('click', closeAuthModal);
+            
+            
 
-            document.getElementById('tabAuthLogin').addEventListener('click', () => {
-                authMode = 'login';
-                document.getElementById('tabAuthLogin').classList.add('text-black', 'bg-gradient-to-r', 'from-amber-300', 'to-amber-500');
-                document.getElementById('tabAuthLogin').classList.remove('text-gray-400');
-                document.getElementById('tabAuthSignup').classList.remove('text-black', 'bg-gradient-to-r', 'from-amber-300', 'to-amber-500');
-                document.getElementById('tabAuthSignup').classList.add('text-gray-400');
-                document.getElementById('btnAuthSubmit').innerText = 'Log In';
-            });
+            
 
-            document.getElementById('tabAuthSignup').addEventListener('click', () => {
-                authMode = 'signup';
-                document.getElementById('tabAuthSignup').classList.add('text-black', 'bg-gradient-to-r', 'from-amber-300', 'to-amber-500');
-                document.getElementById('tabAuthSignup').classList.remove('text-gray-400');
-                document.getElementById('tabAuthLogin').classList.remove('text-black', 'bg-gradient-to-r', 'from-amber-300', 'to-amber-500');
-                document.getElementById('tabAuthLogin').classList.add('text-gray-400');
-                document.getElementById('btnAuthSubmit').innerText = 'Create Account';
-            });
+            
 
-            document.getElementById('authForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('authEmail').value;
-                const password = document.getElementById('authPassword').value;
-                const msgBox = document.getElementById('authMessage');
+            
 
-                msgBox.classList.add('hidden');
-
-                if (!auth) {
-                    alert("Firebase Auth is operating in Local Storage Guest Mode.");
-                    return;
-                }
-
-                try {
-                    if (authMode === 'login') {
-                        await signInWithEmailAndPassword(auth, email, password);
-                    } else {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    }
-                    closeAuthModal();
-                } catch (err) {
-                    msgBox.innerText = err.message;
-                    msgBox.className = "text-xs p-3 rounded-lg border bg-rose-950/40 border-rose-800 text-rose-300";
-                    msgBox.classList.remove('hidden');
-                }
-            });
-
-            const btnLogoutElem = document.getElementById('btnLogout');
-            if (btnLogoutElem) {
-                btnLogoutElem.addEventListener('click', async () => {
-                    if (auth) {
-                        await signOut(auth);
-                    }
-                    closeAuthModal();
-                });
-            }
+            
 
             document.getElementById('btnExportData').addEventListener('click', () => {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localProgressData, null, 2));
@@ -1916,6 +1675,7 @@
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
+                markBackedUp();
             });
             
             document.getElementById('btnImportData').addEventListener('click', () => {
@@ -1927,11 +1687,14 @@
                     const reader = new FileReader();
                     reader.onload = (evt) => {
                         try {
-                            localProgressData = JSON.parse(evt.target.result);
+                            const parsed = sanitizeProgress(JSON.parse(evt.target.result));
+                            if (!confirm('Replace your current progress with this backup?')) { e.target.value = ''; return; }
+                            localProgressData = parsed;
                             saveProgress();
-                            document.getElementById('backupModal').classList.add('opacity-0', 'pointer-events-none');
+                            e.target.value = '';
+                            document.getElementById('btnCloseSettingsModal').click();
                         } catch (err) {
-                            alert("Invalid JSON save file.");
+                            alert("That file is not a valid Damascus tracker save.");
                         }
                     };
                     reader.readAsText(e.target.files[0]);
