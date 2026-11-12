@@ -4714,7 +4714,16 @@
             onSnapshot 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = window.firebaseConfig;
+       const firebaseConfig = {
+  apiKey: "AIzaSyD-HeUyyPLsCtKBNLc_cPqP_pkwFJmdDVo",
+  authDomain: "://firebaseapp.com",
+  projectId: "codm-damascus-camo-tracker",
+  storageBucket: "codm-damascus-camo-tracker.firebasestorage.app",
+  messagingSenderId: "567339244608",
+  appId: "1:567339244608:web:31b7ab035c7f6997c753a5",
+  measurementId: "G-R06VYR32GR"
+};
+ = window.firebaseConfig;
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'codm-damascus-tracker-arnob24';
         
         // App State & Globals Initialization
@@ -5835,30 +5844,7 @@
     </script>
 
 
-    <!-- Firebase Analytics -->
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-analytics.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      const firebaseConfig = {
-        apiKey: "AIzaSyD-HeUyyPLsCtKBNLc_cPqP_pkwFJmdDVo",
-        authDomain: "codm-damascus-camo-tracker.firebaseapp.com",
-        projectId: "codm-damascus-camo-tracker",
-        storageBucket: "codm-damascus-camo-tracker.firebasestorage.app",
-        messagingSenderId: "567339244608",
-        appId: "1:567339244608:web:31b7ab035c7f6997c753a5",
-        measurementId: "G-R06VYR32GR"
-      };
-
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-    </script>
+   
 
 
-</body></html>`
+</body></html>
