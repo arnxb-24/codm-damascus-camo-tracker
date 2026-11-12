@@ -502,6 +502,17 @@
             <!-- Action Controls & Auth Status -->
             <div class="flex items-center space-x-3">
                 
+                <!-- Total Visits (all devices) -->
+                <div id="visitPill" title="Total visits from all devices" class="hidden luxury-visit-pill select-none cursor-default">
+                    <div class="luxury-visit-inner px-3 py-1.5 flex items-center space-x-2 text-xs font-mono">
+                        <div class="luxury-visit-sheen"></div>
+                        <span class="luxury-gold-beacon shrink-0"></span>
+                        <i class="fa-solid fa-eye text-[11px] luxury-gold-eye"></i>
+                        <span id="globalUserCountText" class="luxury-gold-number font-extrabold tracking-tight text-[13px]">0</span>
+                        <span id="visitLabel" class="hidden sm:inline luxury-gold-label font-bold text-[9px] uppercase">VISITS</span>
+                    </div>
+                </div>
+
                 <!-- Settings Button (Data Backup & Reset) -->
                 <button id="btnSettingsModal" title="Settings & Backup" class="gold-sheen-btn bg-black/80 hover:bg-amber-950/30 text-amber-200 border border-amber-500/30 text-xs px-3 py-2 rounded-lg transition flex items-center space-x-1.5 group">
                     <i class="fa-solid fa-gear text-codGold group-hover:rotate-90 transition-transform duration-300"></i>
@@ -1232,7 +1243,49 @@
             if (banner) banner.classList.toggle('hidden', !(hasProgress() && (days === null || days >= 7)));
         }
 
+        // ---- Global visit counter (Firestore, no login) ----
+        // Paste your Firebase web config here (Firebase console > Project settings > Your apps > Web app).
+        // Leave as null to hide the counter. See the Firestore rules in the instructions.
+        const FIREBASE_CONFIG = null;
+
+        function showVisitCount(n) {
+            const pill = document.getElementById('visitPill');
+            const el = document.getElementById('globalUserCountText');
+            const lbl = document.getElementById('visitLabel');
+            if (!pill || !el) return;
+            pill.classList.remove('hidden');
+            if (lbl) lbl.innerText = n === 1 ? 'VISIT' : 'VISITS';
+            const start = performance.now(), dur = 900;
+            (function step(now) {
+                const p = Math.min((now - start) / dur, 1);
+                el.innerText = Math.round(n * (1 - Math.pow(1 - p, 4))).toLocaleString();
+                if (p < 1) requestAnimationFrame(step); else el.innerText = n.toLocaleString();
+            })(start);
+        }
+
+        async function initVisitCounter() {
+            if (!FIREBASE_CONFIG) return;
+            try {
+                const V = '11.6.1', base = 'https://www.gstatic.com/firebasejs/' + V + '/';
+                const [appMod, fsMod] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-firestore.js')]);
+                const db = fsMod.getFirestore(appMod.initializeApp(FIREBASE_CONFIG));
+                const ref = fsMod.doc(db, 'public_metrics', 'visits');
+
+                let counted = false;
+                try { counted = !!sessionStorage.getItem('codm_visit_counted'); sessionStorage.setItem('codm_visit_counted', '1'); } catch (e) {}
+                if (!counted) {
+                    try { await fsMod.updateDoc(ref, { count: fsMod.increment(1) }); }
+                    catch (e) { try { await fsMod.setDoc(ref, { count: 1 }); } catch (e2) {} }
+                }
+                const snap = await fsMod.getDoc(ref);
+                if (snap.exists() && Number.isFinite(snap.data().count)) showVisitCount(snap.data().count);
+            } catch (e) {
+                console.warn('Visit counter unavailable:', e);
+            }
+        }
+
         function initLocal() {
+            initVisitCounter();
             // Ask the browser not to evict this site's saved data when storage runs low.
             try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
             renderApp();
