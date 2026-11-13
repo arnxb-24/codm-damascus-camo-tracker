@@ -1246,7 +1246,14 @@
         // ---- Global visit counter (Firestore, no login) ----
         // Paste your Firebase web config here (Firebase console > Project settings > Your apps > Web app).
         // Leave as null to use the built-in hosted counter instead.
-        const FIREBASE_CONFIG = null;
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyD-HeUyyPLsCtKBNLc_cPqP_pkwFJmdDVo",
+            authDomain: "codm-damascus-camo-tracker.firebaseapp.com",
+            projectId: "codm-damascus-camo-tracker",
+            storageBucket: "codm-damascus-camo-tracker.firebasestorage.app",
+            messagingSenderId: "567339244608",
+            appId: "1:567339244608:web:31b7ab035c7f6997c753a5"
+        };
 
         function showVisitCount(n) {
             const pill = document.getElementById('visitPill');
