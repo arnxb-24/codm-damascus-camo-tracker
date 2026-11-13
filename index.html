@@ -502,7 +502,7 @@
             <div class="flex items-center space-x-3">
                 
                 <!-- Total Visits (all devices) -->
-                <div id="visitPill" title="Total visits from all devices" class="hidden luxury-visit-pill select-none cursor-default">
+                <div id="visitPill" title="Total page views from all devices" class="hidden luxury-visit-pill select-none cursor-default">
                     <div class="luxury-visit-inner px-3 py-1.5 flex items-center space-x-2 text-xs font-mono">
                         <div class="luxury-visit-sheen"></div>
                         <span class="luxury-gold-beacon shrink-0"></span>
@@ -1213,7 +1213,7 @@
             if (banner) banner.classList.toggle('hidden', !(hasProgress() && (days === null || days >= 7)));
         }
 
-        // ---- Global visit counter (Firestore or Hosted CountAPI with Local Fallback) ----
+        // ---- Global visit counter (+1 on EVERY open / refresh) ----
         // Paste your Firebase web config here (Firebase console > Project settings > Your apps > Web app).
         // Leave as null to use the built-in hosted counter instead.
         const FIREBASE_CONFIG = null;
@@ -1238,16 +1238,8 @@
 
         async function initHostedCounter() {
             try {
-                let counted = false;
-                try { 
-                    counted = !!sessionStorage.getItem('codm_visit_counted'); 
-                    if (!counted) sessionStorage.setItem('codm_visit_counted', '1'); 
-                } catch (e) {}
-
-                const endpoint = counted 
-                    ? `https://api.countapi.xyz/get/${COUNTER_NAMESPACE}/${COUNTER_KEY}`
-                    : `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
-
+                // Always hit /hit/ so every page open or refresh adds +1
+                const endpoint = `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
                 const res = await fetch(endpoint, { cache: 'no-store' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
@@ -1258,15 +1250,12 @@
                     throw new Error('Invalid counter payload');
                 }
             } catch (e) {
-                console.warn('Primary counter unavailable, falling back to local storage counter:', e);
-                let localVisits = parseInt(localStorage.getItem('codm_local_fallback_visits') || '1420', 10);
-                if (!sessionStorage.getItem('codm_local_counted')) {
-                    localVisits++;
-                    try {
-                        localStorage.setItem('codm_local_fallback_visits', String(localVisits));
-                        sessionStorage.setItem('codm_local_counted', '1');
-                    } catch (err) {}
-                }
+                console.warn('Primary counter unavailable, falling back to local counter:', e);
+                let localVisits = parseInt(localStorage.getItem('codm_local_fallback_visits') || '0', 10);
+                localVisits++;
+                try {
+                    localStorage.setItem('codm_local_fallback_visits', String(localVisits));
+                } catch (err) {}
                 showVisitCount(localVisits);
             }
         }
@@ -1279,12 +1268,10 @@
                 const db = fsMod.getFirestore(appMod.initializeApp(FIREBASE_CONFIG));
                 const ref = fsMod.doc(db, 'public_metrics', 'visits');
 
-                let counted = false;
-                try { counted = !!sessionStorage.getItem('codm_visit_counted'); sessionStorage.setItem('codm_visit_counted', '1'); } catch (e) {}
-                if (!counted) {
-                    try { await fsMod.updateDoc(ref, { count: fsMod.increment(1) }); }
-                    catch (e) { try { await fsMod.setDoc(ref, { count: 1 }); } catch (e2) {} }
-                }
+                // Always increment +1 on every page open / refresh
+                try { await fsMod.updateDoc(ref, { count: fsMod.increment(1) }); }
+                catch (e) { try { await fsMod.setDoc(ref, { count: 1 }); } catch (e2) {} }
+
                 const snap = await fsMod.getDoc(ref);
                 if (snap.exists() && Number.isFinite(snap.data().count)) showVisitCount(snap.data().count);
             } catch (e) {
