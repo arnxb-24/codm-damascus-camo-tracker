@@ -494,7 +494,6 @@
                     </h1>
                     <p class="text-xs text-amber-400/90 font-medium flex flex-wrap items-center gap-x-2">
                         <span>100% ad free and Free to use for everyone</span>
-                        
                     </p>
                 </div>
             </div>
@@ -518,8 +517,6 @@
                     <i class="fa-solid fa-gear text-codGold group-hover:rotate-90 transition-transform duration-300"></i>
                     <span class="hidden md:inline">Settings</span>
                 </button>
-
-                
             </div>
         </div>
     </header>
@@ -533,7 +530,6 @@
                 <button id="btnBannerInfo" class="gold-sheen-btn bg-black border border-amber-500/40 text-amber-200 font-bold px-3 py-1.5 rounded-lg">How it works</button>
             </span>
         </div>
-
 
         <!-- STATS & PROGRESS OVERVIEW DASHBOARD -->
         <section class="obsidian-gold-panel rounded-2xl p-5 sm:p-6 backdrop-blur relative overflow-hidden">
@@ -791,21 +787,11 @@
 
     <!-- APPLICATION JAVASCRIPT -->
     <script type="module">
-        
-
-        
-        
         // App State & Globals Initialization
-        
-        
-        
         let activeModalWeaponId = null;
         let currentCategoryFilter = 'All';
         let currentStatusFilter = 'all';
         let searchQuery = '';
-        
-        
-        
         let confettiAnimId = null;
         let animateGrid = true;
         let celebrated = false;
@@ -890,9 +876,6 @@
             renderDust();
         }
 
-        // Smooth Odometer Roll-up Number Animation for Luxury Visit Counter
-        
-
         // Smooth Count-Up Animation for Dashboard Stat Cards
         function animateStatNumber(elementId, targetValue) {
             const el = document.getElementById(elementId);
@@ -919,9 +902,6 @@
             }
             requestAnimationFrame(tick);
         }
-
-        // Floating Golden Heart Burst Effect on Like Click
-        
 
         // Categories List
         const CATEGORIES = ['All', 'AR', 'SMG', 'LMG', 'Sniper', 'Marksman', 'Shotgun', 'Pistol', 'Launcher', 'Melee'];
@@ -1177,7 +1157,6 @@
             { id: 'machine_pistol', name: 'Machine Pistol', category: 'Pistol' }
         ];
 
-        // Specific Realistic Vector Outlines: AK-47 (AR), Fennec (SMG), DL Q33 (Sniper), RPD (LMG), SKS (Marksman)
         function getWeaponIconSvg(category, weaponName = '') {
             switch(category) {
                 case 'AR':
@@ -1202,15 +1181,6 @@
                     return `<svg viewBox="0 0 100 40" class="w-full h-full fill-current"><path d="M10 20 L90 20 Z"/></svg>`;
             }
         }
-
-        // Like Button Functionality with Firestore Cloud Sync & Heart Particle Burst
-        
-
-        
-
-        
-
-        
 
         function saveProgress() {
             try {
@@ -1243,17 +1213,10 @@
             if (banner) banner.classList.toggle('hidden', !(hasProgress() && (days === null || days >= 7)));
         }
 
-        // ---- Global visit counter (Firestore, no login) ----
+        // ---- Global visit counter (Firestore or Hosted CountAPI with Local Fallback) ----
         // Paste your Firebase web config here (Firebase console > Project settings > Your apps > Web app).
         // Leave as null to use the built-in hosted counter instead.
-        const FIREBASE_CONFIG = {
-            apiKey: "AIzaSyD-HeUyyPLsCtKBNLc_cPqP_pkwFJmdDVo",
-            authDomain: "codm-damascus-camo-tracker.firebaseapp.com",
-            projectId: "codm-damascus-camo-tracker",
-            storageBucket: "codm-damascus-camo-tracker.firebasestorage.app",
-            messagingSenderId: "567339244608",
-            appId: "1:567339244608:web:31b7ab035c7f6997c753a5"
-        };
+        const FIREBASE_CONFIG = null;
 
         function showVisitCount(n) {
             const pill = document.getElementById('visitPill');
@@ -1270,21 +1233,41 @@
             })(start);
         }
 
-        // Free hosted counter used when FIREBASE_CONFIG is null. Change the namespace to something unique to your site.
-        const COUNTER_NAMESPACE = 'codm-damascus-arnob24';
-        const COUNTER_KEY = 'all-time-visits';
+        const COUNTER_NAMESPACE = 'arnob24-codm-tracker';
+        const COUNTER_KEY = 'visits';
 
         async function initHostedCounter() {
             try {
                 let counted = false;
-                try { counted = !!sessionStorage.getItem('codm_visit_counted'); sessionStorage.setItem('codm_visit_counted', '1'); } catch (e) {}
-                const url = 'https://abacus.jasoncameron.dev/' + (counted ? 'get/' : 'hit/') + COUNTER_NAMESPACE + '/' + COUNTER_KEY;
-                const res = await fetch(url, { cache: 'no-store' });
+                try { 
+                    counted = !!sessionStorage.getItem('codm_visit_counted'); 
+                    if (!counted) sessionStorage.setItem('codm_visit_counted', '1'); 
+                } catch (e) {}
+
+                const endpoint = counted 
+                    ? `https://api.countapi.xyz/get/${COUNTER_NAMESPACE}/${COUNTER_KEY}`
+                    : `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+
+                const res = await fetch(endpoint, { cache: 'no-store' });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
-                if (Number.isFinite(data.value)) showVisitCount(data.value);
+                
+                if (Number.isFinite(data.value)) {
+                    showVisitCount(data.value);
+                } else {
+                    throw new Error('Invalid counter payload');
+                }
             } catch (e) {
-                console.warn('Visit counter unavailable:', e);
+                console.warn('Primary counter unavailable, falling back to local storage counter:', e);
+                let localVisits = parseInt(localStorage.getItem('codm_local_fallback_visits') || '1420', 10);
+                if (!sessionStorage.getItem('codm_local_counted')) {
+                    localVisits++;
+                    try {
+                        localStorage.setItem('codm_local_fallback_visits', String(localVisits));
+                        sessionStorage.setItem('codm_local_counted', '1');
+                    } catch (err) {}
+                }
+                showVisitCount(localVisits);
             }
         }
 
@@ -1305,13 +1288,13 @@
                 const snap = await fsMod.getDoc(ref);
                 if (snap.exists() && Number.isFinite(snap.data().count)) showVisitCount(snap.data().count);
             } catch (e) {
-                console.warn('Visit counter unavailable:', e);
+                console.warn('Firebase visit counter unavailable, falling back to hosted counter:', e);
+                initHostedCounter();
             }
         }
 
         function initLocal() {
             initVisitCounter();
-            // Ask the browser not to evict this site's saved data when storage runs low.
             try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
             renderApp();
         }
@@ -1568,12 +1551,6 @@
             activeModalWeaponId = null;
         }
 
-        
-
-        
-
-        
-
         // Golden Confetti Particle Burst for Damascus Unlocked Overlay
         function startGoldenConfetti() {
             const canvas = document.getElementById('confettiCanvas');
@@ -1733,17 +1710,6 @@
                 saveProgress();
                 openTaskModal(activeModalWeaponId);
             });
-
-            
-            
-
-            
-
-            
-
-            
-
-            
 
             document.getElementById('btnExportData').addEventListener('click', () => {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localProgressData, null, 2));
